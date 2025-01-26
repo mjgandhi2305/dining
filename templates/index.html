@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dotslash Dining</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        input,
+        button {
+            margin: 10px 0;
+            padding: 8px;
+            width: 200px;
+        }
+
+        button {
+            background-color: #007BFF;
+            color: #FFF;
+            border: none;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        p {
+            color: #333;
+        }
+
+        video {
+            border: 1px solid #333;
+            width: 100%;
+            max-width: 600px;
+            height: auto;
+        }
+    </style>
+</head>
+
+<body>
+    <div>
+        <h1>Dotslash Dining</h1>
+
+        <h2>Scan QR Code with Camera</h2>
+        <video id="video-feed" autoplay></video>
+        <p id="camera_message"></p>
+
+        <h2>Scan QR Code Manually</h2>
+        <input type="text" id="username" placeholder="Scan QR Code (Username)">
+        <button onclick="scanQRCode()">Scan QR Code</button>
+        <p id="message"></p>
+
+        <h2>Reactivate QR Code</h2>
+        <input type="text" id="admin_username" placeholder="Admin Username">
+        <input type="text" id="target_username" placeholder="Target Username">
+        <button onclick="reactivateQRCode()">Reactivate QR Code</button>
+        <p id="reactivate_message"></p>
+    </div>
+    <script>
+        function scanQRCode() {
+            const username = document.getElementById('username').value;
+            fetch('/scan', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `username=${username}`
+            })
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('message').innerText = data.message;
+                });
+        }
+
+        function reactivateQRCode() {
+            const admin_username = document.getElementById('admin_username').value;
+            const target_username = document.getElementById('target_username').value;
+            fetch('/reactivate', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `admin_username=${admin_username}&target_username=${target_username}`
+            })
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('reactivate_message').innerText = data.message;
+                });
+        }
+
+        // Set up the video feed
+        const video = document.getElementById('video-feed');
+        if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+            navigator.mediaDevices.getUserMedia({ video: true }).then(stream => {
+                video.srcObject = stream;
+                video.play();
+            });
+        }
+    </script>
+</body>
+
+</html>
