@@ -1,6 +1,4 @@
 flask
-datetime
-os
 cv2
 pyzbar
 qrcode
